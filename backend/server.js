@@ -67,6 +67,8 @@ app.use("/api/chatbot", chatbotRoutes);
     }
   });
 });
+// Frontend is served separately on Vercel.
+// No need to serve frontend files from backend on Render.
 
 //  if (process.env.NODE_ENV === 'production') {
 //   const frontendPath = path.join(__dirname, '../frontend/dist');
