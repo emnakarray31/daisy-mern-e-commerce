@@ -2,7 +2,20 @@ import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from '../lib/axios';
 import Fuse from 'fuse.js';
-
+ const highlightMatch = (text, query) => {
+	if (!text || !query) return text;
+	
+	try {
+		const regex = new RegExp(`(${query})`, 'gi');
+		const parts = text.split(regex);
+		
+		return parts.map((part, index) => 
+			regex.test(part) ? <mark key={index} style={{ background: '#fff3cd', padding: '2px 4px' }}>{part}</mark> : part
+		);
+	} catch (error) {
+		return text;
+	}
+};
 const IntelligentSearch = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [suggestions, setSuggestions] = useState({

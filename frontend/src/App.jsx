@@ -45,6 +45,14 @@ import { useUserStore } from "./stores/useUserStore";
 import { useCartStore } from "./stores/useCartStore";
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
+// Keep backend alive
+useEffect(() => {
+  const ping = setInterval(() => {
+    fetch('https://daisy-mern-e-commerce.onrender.com/api').catch(() => {});
+  }, 600000);
+  return () => clearInterval(ping);
+}, []);
+
 
 function App() {
   const { user, checkAuth, checkingAuth } = useUserStore();
