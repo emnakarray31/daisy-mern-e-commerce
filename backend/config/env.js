@@ -1,0 +1,12 @@
+import { config } from 'dotenv';
+import path from 'path';
+import { fileURLToPath } from 'url';
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+config({ path: path.join(__dirname, '../.env') });
+console.log('\n🔧 Environment Variables Loaded:');
+console.log('MONGO_URI:', process.env.MONGO_URI ? '✅ Found' : '❌ Not found');
+console.log('STRIPE_SECRET_KEY:', process.env.STRIPE_SECRET_KEY ? '✅ Found (' + process.env.STRIPE_SECRET_KEY.substring(0, 7) + '...)' : '❌ Not found');
+console.log('CLIENT_URL:', process.env.CLIENT_URL || 'http://localhost:5173 (default)');
+console.log('');
+export default process.env;
