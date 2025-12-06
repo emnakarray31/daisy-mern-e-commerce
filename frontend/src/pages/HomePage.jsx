@@ -92,7 +92,9 @@ const HomePage = () => {
 								<IntelligentSearch /> 
 							</div>
 							<div className="hero__item set-bg" style={{
-								backgroundImage: 'linear-gradient(rgba(0,0,0,0.2), rgba(0,0,0,0.3)), url(../../../../public/vogue2.jpg)',
+								backgroundImage: 'linear-gradient(rgba(0,0,0,0.2), rgba(0,0,0,0.3)), url(../../../../../frontend/public/vogue2.jpg)',
+
+								
 								height: '550px',
 								backgroundSize: 'cover',
 								backgroundPosition: 'center',
