@@ -14,22 +14,22 @@ const generateTokens = (userId) => {
 
 	return { accessToken, refreshToken };
 };
-
+ 
 const setCookies = (res, accessToken, refreshToken) => {
 	res.cookie("accessToken", accessToken, {
 		httpOnly: true,  
 		secure: process.env.NODE_ENV === "production",
-		sameSite: "strict",  
+		sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",  
 		maxAge: 15 * 60 * 1000,  
 	});
 	res.cookie("refreshToken", refreshToken, {
 		httpOnly: true,  
 		secure: process.env.NODE_ENV === "production",
-		sameSite: "strict",  
+		sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",  
 		maxAge: 7 * 24 * 60 * 60 * 1000,  
 	});
 };
-
+ 
 export const signup = async (req, res) => {
 	const { email, password, name } = req.body;
 	try {
@@ -41,19 +41,23 @@ export const signup = async (req, res) => {
 		const user = await User.create({ name, email, password });
 		const { accessToken, refreshToken } = generateTokens(user._id);
 		setCookies(res, accessToken, refreshToken);
-
+ 
 		res.status(201).json({
-			_id: user._id,
-			name: user.name,
-			email: user.email,
-			role: user.role,
+			user: {
+				_id: user._id,
+				name: user.name,
+				email: user.email,
+				role: user.role,
+			},
+			accessToken,     
+			refreshToken      
 		});
 	} catch (error) {
 		console.log("Error in signup controller", error.message);
 		res.status(500).json({ message: error.message });
 	}
 };
-
+ 
 export const login = async (req, res) => {
 	try {
 		const { email, password } = req.body;
@@ -62,12 +66,16 @@ export const login = async (req, res) => {
 		if (user && (await user.comparePassword(password))) {
 			const { accessToken, refreshToken } = generateTokens(user._id);
 			setCookies(res, accessToken, refreshToken);
-
+ 
 			res.json({
-				_id: user._id,
-				name: user.name,
-				email: user.email,
-				role: user.role,
+				user: {
+					_id: user._id,
+					name: user.name,
+					email: user.email,
+					role: user.role,
+				},
+				accessToken,     
+				refreshToken       
 			});
 		} else {
 			res.status(400).json({ message: "Invalid email or password" });
@@ -77,7 +85,7 @@ export const login = async (req, res) => {
 		res.status(500).json({ message: error.message });
 	}
 };
-
+ 
 export const logout = async (req, res) => {
 	try {
 		res.clearCookie("accessToken");
@@ -88,10 +96,10 @@ export const logout = async (req, res) => {
 		res.status(500).json({ message: "Server error", error: error.message });
 	}
 };
-
+ 
 export const refreshToken = async (req, res) => {
-	try {
-		const refreshToken = req.cookies.refreshToken;
+	try { 
+		const refreshToken = req.cookies.refreshToken || req.body.refreshToken;
 
 		if (!refreshToken) {
 			return res.status(401).json({ message: "No refresh token provided" });
@@ -105,11 +113,14 @@ export const refreshToken = async (req, res) => {
 		res.cookie("accessToken", accessToken, {
 			httpOnly: true,
 			secure: process.env.NODE_ENV === "production",
-			sameSite: "strict",
+			sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
 			maxAge: 15 * 60 * 1000,
 		});
 
-		res.json({ message: "Token refreshed successfully" });
+ 		res.json({ 
+			message: "Token refreshed successfully",
+			accessToken   
+		});
 	} catch (error) {
 		console.log("Error in refreshToken controller", error.message);
 		res.status(500).json({ message: "Server error", error: error.message });
